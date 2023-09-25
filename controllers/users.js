@@ -63,5 +63,9 @@ module.exports.updateUserInfo = (req, res, next) => {
 
   User.findByIdAndUpdate(req.user._id, { name, email }, { new: true, runValidators: true })
     .then((user) => res.send({ user }))
-    .catch(next);
+    .catch((err) => {
+      if (err.code === 11000) {
+        next(new ConflictError('Пользователь с таким email-адресом уже существует'));
+      } else next(err);
+    });
 };
